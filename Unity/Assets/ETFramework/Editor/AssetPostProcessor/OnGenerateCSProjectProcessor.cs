@@ -102,20 +102,21 @@ namespace ET
                 itemGroup.AppendChild(compile);
             }
 
-            var projectReference = newDoc.CreateElement("ProjectReference", newDoc.DocumentElement.NamespaceURI);
-            projectReference.SetAttribute("Include", @"..\Share\Analyzer\Share.Analyzer.csproj");
-            projectReference.SetAttribute("OutputItemType", @"Analyzer");
-            projectReference.SetAttribute("ReferenceOutputAssembly", @"false");
-
-            var project = newDoc.CreateElement("Project", newDoc.DocumentElement.NamespaceURI);
-            project.InnerText = @"{d1f2986b-b296-4a2d-8f12-be9f470014c3}";
-            projectReference.AppendChild(project);
-
-            var name = newDoc.CreateElement("Name", newDoc.DocumentElement.NamespaceURI);
-            name.InnerText = "Analyzer";
-            projectReference.AppendChild(project);
-
-            itemGroup.AppendChild(projectReference);
+            // 禁用ET的自动生成, 每次Unity外有新增脚本的时候手动调用Preference下的Regenerate project file.
+            // var projectReference = newDoc.CreateElement("ProjectReference", newDoc.DocumentElement.NamespaceURI);
+            // projectReference.SetAttribute("Include", @"..\Share\Analyzer\Share.Analyzer.csproj");
+            // projectReference.SetAttribute("OutputItemType", @"Analyzer");
+            // projectReference.SetAttribute("ReferenceOutputAssembly", @"false");
+            //
+            // var project = newDoc.CreateElement("Project", newDoc.DocumentElement.NamespaceURI);
+            // project.InnerText = @"{d1f2986b-b296-4a2d-8f12-be9f470014c3}";
+            // projectReference.AppendChild(project);
+            //
+            // var name = newDoc.CreateElement("Name", newDoc.DocumentElement.NamespaceURI);
+            // name.InnerText = "Analyzer";
+            // projectReference.AppendChild(project);
+            //
+            // itemGroup.AppendChild(projectReference);
 
             rootNode.AppendChild(itemGroup);
 
