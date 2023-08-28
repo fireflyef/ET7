@@ -138,21 +138,31 @@ namespace ET
 
             AssemblyBuilder assemblyBuilder = new AssemblyBuilder(dllPath, scripts.ToArray());
 
+            var excluedPath = new string[]{
+                "Library/ScriptAssemblies/Unity.Model.dll",
+                "Library/ScriptAssemblies/Unity.ModelView.dll",
+                "Library/ScriptAssemblies/Unity.Hotfix.dll",
+                "Library/ScriptAssemblies/Unity.HotfixView.dll",
+            }; 
+
+            // 客户端不需要的dll
+            var arr = new string[]{
+                "DnsClient.dll", 
+                "MongoDB.Driver.Core.dll", 
+                "MongoDB.Driver.dll", 
+                "MongoDB.Driver.Legacy.dll",
+                "MongoDB.Libmongocrypt.dll", 
+                "SharpCompress.dll", 
+                "System.Buffers.dll", 
+                "System.Runtime.CompilerServices.Unsafe.dll",
+                "System.Text.Encoding.CodePages.dll"
+            };
+
             if (codeMode == CodeMode.Client)
             {
-                assemblyBuilder.excludeReferences = new string[]
-                {
-                    "DnsClient.dll", 
-                    "MongoDB.Driver.Core.dll", 
-                    "MongoDB.Driver.dll", 
-                    "MongoDB.Driver.Legacy.dll",
-                    "MongoDB.Libmongocrypt.dll", 
-                    "SharpCompress.dll", 
-                    "System.Buffers.dll", 
-                    "System.Runtime.CompilerServices.Unsafe.dll",
-                    "System.Text.Encoding.CodePages.dll"
-                };
+                excluedPath = excluedPath.Concat(arr).ToArray();
             }
+            assemblyBuilder.excludeReferences = excluedPath;
 
             //启用UnSafe
             assemblyBuilder.compilerOptions.AllowUnsafeCode = true;

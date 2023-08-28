@@ -1,14 +1,12 @@
 {
-    "name": "Unity.HotfixView",
+    "name": "Unity.ModelView",
     "rootNamespace": "ET",
     "references": [
         "Unity.ThirdParty",
-        "Unity.Model",
-        "Unity.Hotfix",
-        "Unity.ModelView",
         "Unity.Core",
         "Unity.Mathematics",
-        "Unity.Loader"
+        "Unity.Loader",
+        "Unity.Model"
     ],
     "includePlatforms": [
         "Editor"

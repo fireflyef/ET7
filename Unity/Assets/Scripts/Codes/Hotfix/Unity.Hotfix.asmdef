@@ -1,12 +1,12 @@
 {
-    "name": "Unity.ModelView.Codes",
+    "name": "Unity.Hotfix",
     "rootNamespace": "ET",
     "references": [
         "Unity.ThirdParty",
         "Unity.Core",
-        "Unity.Model.Codes",
         "Unity.Mathematics",
-        "Unity.Loader"
+        "Unity.Loader",
+        "Unity.Model"
     ],
     "includePlatforms": [
         "Editor"
@@ -16,9 +16,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        "ENABLE_CODES"
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": false
+    "noEngineReferences": true
 }
