@@ -8,7 +8,7 @@ namespace ET
     {
         public static void Run(string cmd, string workDirectory, List<string> environmentVars = null)
         {
-            System.Diagnostics.Process process = new();
+            Process process = new();
             try
             {
 #if UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX

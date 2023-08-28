@@ -7,8 +7,8 @@ namespace ET
     {
         public object Clone()
         {
-            byte[] bytes = MongoHelper.Serialize(this);
-            return MongoHelper.Deserialize(this.GetType(), bytes, 0, bytes.Length);
+            byte[] bytes = SerializeHelper.Serialize(this);
+            return SerializeHelper.Deserialize(this.GetType(), bytes, 0, bytes.Length);
         }
         
         public virtual void BeginInit()
@@ -17,6 +17,11 @@ namespace ET
         
         
         public virtual void EndInit()
+        {
+        }
+        
+        
+        public virtual void AfterEndInit()
         {
         }
     }

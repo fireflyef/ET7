@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace ET
 {
@@ -16,15 +15,6 @@ namespace ET
         
         public virtual void EndInit()
         {
-        }
-    }
-
-    public interface IPool
-    {
-        bool IsFromPool
-        {
-            get;
-            set;
         }
     }
 }

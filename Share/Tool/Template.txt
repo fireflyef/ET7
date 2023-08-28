@@ -1,25 +1,39 @@
 using System;
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Options;
-using System.ComponentModel;
+using ProtoBuf;
 
 namespace ET
 {
+    [ProtoContract]
     [Config]
-    public partial class (ConfigName)Category : Singleton<(ConfigName)Category>, IMerge
+    public partial class (ConfigName)Category : ConfigSingleton<(ConfigName)Category>, IMerge
     {
+        [ProtoIgnore]
+        [BsonIgnore]
+        private Dictionary<int, (ConfigName)> dict = new Dictionary<int, (ConfigName)>();
+		
         [BsonElement]
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)]
-        private Dictionary<int, (ConfigName)> dict = new();
+        [ProtoMember(1)]
+        private List<(ConfigName)> list = new List<(ConfigName)>();
 		
         public void Merge(object o)
         {
             (ConfigName)Category s = o as (ConfigName)Category;
-            foreach (var kv in s.dict)
+            this.list.AddRange(s.list);
+        }
+		
+		[ProtoAfterDeserialization]        
+        public void ProtoEndInit()
+        {
+            foreach ((ConfigName) config in list)
             {
-                this.dict.Add(kv.Key, kv.Value);
+                config.AfterEndInit();
+                this.dict.Add(config.Id, config);
             }
+            this.list.Clear();
+            
+            this.AfterEndInit();
         }
 		
         public (ConfigName) Get(int id)
@@ -54,6 +68,7 @@ namespace ET
         }
     }
 
+    [ProtoContract]
 	public partial class (ConfigName): ProtoObject, IConfig
 	{
 (Fields)

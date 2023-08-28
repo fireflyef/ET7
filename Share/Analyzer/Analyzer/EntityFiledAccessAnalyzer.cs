@@ -33,39 +33,23 @@ namespace ET.Analyzer
 
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction((analysisContext =>
-            {
-                if (analysisContext.Compilation.AssemblyName==AnalyzeAssembly.UnityCodes)
-                {
-                    analysisContext.RegisterSemanticModelAction((modelAnalysisContext =>
-                    {
-                        if (AnalyzerHelper.IsSemanticModelNeedAnalyze(modelAnalysisContext.SemanticModel,UnityCodesPath.AllModelHotfix))
-                        {
-                            AnalyzeSemanticModel(modelAnalysisContext);
-                        }
-                        
-                    } ));
-                    return;
-                }
-                
-                if (AnalyzerHelper.IsAssemblyNeedAnalyze(analysisContext.Compilation.AssemblyName, AnalyzeAssembly.AllModelHotfix))
-                {
-                    analysisContext.RegisterSemanticModelAction((this.AnalyzeSemanticModel));
-                }
-            } ));
-        }
-        
-        private void AnalyzeSemanticModel(SemanticModelAnalysisContext analysisContext)
-        {
-            foreach (var memberAccessExpressionSyntax in analysisContext.SemanticModel.SyntaxTree.GetRoot().DescendantNodes<MemberAccessExpressionSyntax>())
-            {
-                AnalyzeMemberAccessExpression(analysisContext, memberAccessExpressionSyntax);
-            }
+            context.RegisterSyntaxNodeAction(this.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
         }
 
-        private void AnalyzeMemberAccessExpression(SemanticModelAnalysisContext context, MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+        private void AnalyzeMemberAccessExpression(SyntaxNodeAnalysisContext context)
         {
+            if (!AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllModelHotfix))
+            {
+                return;
+            }
+
+            if (!(context.Node is MemberAccessExpressionSyntax memberAccessExpressionSyntax))
+            {
+                return;
+            }
+
             // -----筛选出实体类的字段symbol-----
+
             ISymbol? filedSymbol = context.SemanticModel.GetSymbolInfo(memberAccessExpressionSyntax).Symbol;
             if (filedSymbol == null || !(filedSymbol is IFieldSymbol))
             {
@@ -77,7 +61,7 @@ namespace ET.Analyzer
                 return;
             }
 
-            if (filedSymbol.ContainingType.BaseType?.ToString() != Definition.EntityType && filedSymbol.ContainingType.BaseType?.ToString() != Definition.LSEntityType)
+            if (filedSymbol.ContainingType.BaseType?.ToString() != Definition.EntityType)
             {
                 return;
             }
@@ -99,7 +83,7 @@ namespace ET.Analyzer
             }
 
             // 实体基类忽略处理
-            if (accessFieldClassSymbol.ToString() is Definition.EntityType or Definition.LSEntityType)
+            if (accessFieldClassSymbol.ToString() == Definition.EntityType)
             {
                 return;
             }
@@ -110,7 +94,11 @@ namespace ET.Analyzer
                 return;
             }
             
-            //判断是否在实体类生命周期System中, 这里做了修改，周期System也不允许
+            //判断是否在实体类生命周期System中
+            if (this.CheckIsEntityLifecycleSystem(accessFieldClassSymbol, filedSymbol.ContainingType))
+            {
+                return;
+            }
 
             //判断是否在实体类的友元类中
             if (this.CheckIsEntityFriendOf(accessFieldClassSymbol, filedSymbol.ContainingType))
@@ -123,6 +111,33 @@ namespace ET.Analyzer
             Diagnostic diagnostic = Diagnostic.Create(Rule, memberAccessExpressionSyntax.GetLocation(), builder.ToImmutable(),filedSymbol.ContainingType.ToString(),
                 filedSymbol.Name);
             context.ReportDiagnostic(diagnostic);
+        }
+
+        private bool CheckIsEntityLifecycleSystem(INamedTypeSymbol accessFieldClassSymbol, INamedTypeSymbol entityTypeSymbol)
+        {
+            if (accessFieldClassSymbol.BaseType == null || !accessFieldClassSymbol.BaseType.IsGenericType)
+            {
+                return false;
+            }
+
+            // 判断是否含有 ObjectSystem Attribute 且继承了接口 ISystemType
+            if (accessFieldClassSymbol.BaseType.HasAttribute(Definition.ObjectSystemAttribute) && accessFieldClassSymbol.HasInterface(Definition.ISystemType))
+            {
+                // 获取 accessFieldClassSymbol 父类的实体类型参数
+                ITypeSymbol? entityTypeArgumentSymbol = accessFieldClassSymbol.BaseType.TypeArguments.FirstOrDefault();
+                if (entityTypeArgumentSymbol == null)
+                {
+                    return false;
+                }
+
+                // 判断 accessFieldClassSymbol 父类的实体类型参数是否为 entityTypeSymbol
+                if (entityTypeArgumentSymbol.ToString() == entityTypeSymbol.ToString())
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool CheckIsEntityFriendOf(INamedTypeSymbol accessFieldTypeSymbol, INamedTypeSymbol entityTypeSymbol)

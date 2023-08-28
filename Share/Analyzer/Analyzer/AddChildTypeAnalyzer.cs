@@ -22,21 +22,16 @@ namespace ET.Analyzer
 
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            //context.RegisterSyntaxNodeAction(this.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
-           context.RegisterCompilationStartAction((analysisContext =>
-           {
-               if (analysisContext.Compilation.AssemblyName==AnalyzeAssembly.UnityCodes)
-               {
-                   analysisContext.RegisterSyntaxNodeAction(this.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
-               }else if (AnalyzerHelper.IsAssemblyNeedAnalyze(analysisContext.Compilation.AssemblyName,AnalyzeAssembly.AllModelHotfix))
-               {
-                   analysisContext.RegisterSyntaxNodeAction(this.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
-               }
-           }));
+            context.RegisterSyntaxNodeAction(this.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private void AnalyzeMemberAccessExpression(SyntaxNodeAnalysisContext context)
         {
+            if (!AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllModelHotfix))
+            {
+                return;
+            }
+
             if (!(context.Node is MemberAccessExpressionSyntax memberAccessExpressionSyntax))
             {
                 return;
@@ -65,14 +60,14 @@ namespace ET.Analyzer
             
             
             // 对于Entity基类会报错 除非标记了EnableAccessEntiyChild
-            if (parentTypeSymbol.ToString() is Definition.EntityType or Definition.LSEntityType)
+            if (parentTypeSymbol.ToString()==Definition.EntityType)
             {
                 HandleAcessEntityChild(context);
                 return;
             }
 
             // 非Entity的子类 跳过
-            if (parentTypeSymbol.BaseType?.ToString()!= Definition.EntityType  && parentTypeSymbol.BaseType?.ToString()!=Definition.LSEntityType)
+            if (parentTypeSymbol.BaseType?.ToString()!= Definition.EntityType)
             {
                 return;
             }

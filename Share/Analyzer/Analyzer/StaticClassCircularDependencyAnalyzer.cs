@@ -43,21 +43,24 @@ namespace ET.Analyzer
 
         private void CompilationStartAnalysis(CompilationStartAnalysisContext context)
         {
-            var dependencyMap = new ConcurrentDictionary<string, HashSet<string>>();
-            var staticClassSet = new HashSet<string>();
-            
-            if (context.Compilation.AssemblyName == AnalyzeAssembly.UnityCodes)
+            if (!AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllHotfix))
             {
-                context.RegisterSyntaxNodeAction(analysisContext => { this.StaticClassDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); }, SyntaxKind.InvocationExpression);
-                context.RegisterCompilationEndAction(analysisContext => { this.CircularDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); });
                 return;
             }
-            
-            if (AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllHotfix))
+
+            if (context.Compilation.AssemblyName == null)
             {
-                context.RegisterSyntaxNodeAction(analysisContext => { this.StaticClassDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); }, SyntaxKind.InvocationExpression);
-                context.RegisterCompilationEndAction(analysisContext => { this.CircularDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); });
+                return;
             }
+
+            var dependencyMap = new ConcurrentDictionary<string, HashSet<string>>();
+            var staticClassSet = new HashSet<string>();
+
+            context.RegisterSyntaxNodeAction(
+                analysisContext => { this.StaticClassDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); },
+                SyntaxKind.InvocationExpression);
+
+            context.RegisterCompilationEndAction(analysisContext => { this.CircularDependencyAnalyze(analysisContext, dependencyMap, staticClassSet); });
         }
 
         

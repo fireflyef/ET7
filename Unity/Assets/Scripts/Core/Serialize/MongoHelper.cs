@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using MongoDB.Bson;
@@ -8,7 +7,6 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
-using TrueSync;
 using Unity.Mathematics;
 
 namespace ET
@@ -82,9 +80,10 @@ namespace ET
         [StaticField]
         private static readonly JsonWriterSettings defaultSettings = new() { OutputMode = JsonOutputMode.RelaxedExtendedJson };
 
-        public static void Register()
+        static MongoHelper()
         {
             // 自动注册IgnoreExtraElements
+
             ConventionPack conventionPack = new ConventionPack { new IgnoreExtraElementsConvention(true) };
 
             ConventionRegistry.Register("IgnoreExtraElements", conventionPack, type => true);
@@ -93,14 +92,8 @@ namespace ET
             RegisterStruct<float3>();
             RegisterStruct<float4>();
             RegisterStruct<quaternion>();
-            
-            RegisterStruct<FP>();
-            RegisterStruct<TSVector>();
-            RegisterStruct<TSVector2>();
-            RegisterStruct<TSVector4>();
-            RegisterStruct<TSQuaternion>();
 
-            Dictionary<string, Type> types = CodeTypes.Instance.GetTypes();
+            Dictionary<string, Type> types = EventSystem.Instance.GetTypes();
             foreach (Type type in types.Values)
             {
                 if (!type.IsSubclassOf(typeof (Object)))
@@ -117,6 +110,10 @@ namespace ET
             }
         }
 
+        public static void Init()
+        {
+        }
+
         public static void RegisterStruct<T>() where T : struct
         {
             BsonSerializer.RegisterSerializer(typeof (T), new StructBsonSerialize<T>());
@@ -124,19 +121,11 @@ namespace ET
 
         public static string ToJson(object obj)
         {
-            if (obj is ISupportInitialize supportInitialize)
-            {
-                supportInitialize.BeginInit();
-            }
             return obj.ToJson(defaultSettings);
         }
 
         public static string ToJson(object obj, JsonWriterSettings settings)
         {
-            if (obj is ISupportInitialize supportInitialize)
-            {
-                supportInitialize.BeginInit();
-            }
             return obj.ToJson(settings);
         }
 
@@ -159,20 +148,11 @@ namespace ET
 
         public static byte[] Serialize(object obj)
         {
-            if (obj is ISupportInitialize supportInitialize)
-            {
-                supportInitialize.BeginInit();
-            }
             return obj.ToBson();
         }
 
         public static void Serialize(object message, MemoryStream stream)
         {
-            if (message is ISupportInitialize supportInitialize)
-            {
-                supportInitialize.BeginInit();
-            }
-            
             using (BsonBinaryWriter bsonWriter = new BsonBinaryWriter(stream, BsonBinaryWriterSettings.Defaults))
             {
                 BsonSerializationContext context = BsonSerializationContext.CreateRoot(bsonWriter);
@@ -191,7 +171,7 @@ namespace ET
             }
             catch (Exception e)
             {
-                throw new Exception($"from bson error: {type.FullName} {bytes.Length}", e);
+                throw new Exception($"from bson error: {type.Name}", e);
             }
         }
 
@@ -206,7 +186,7 @@ namespace ET
             }
             catch (Exception e)
             {
-                throw new Exception($"from bson error: {type.FullName} {bytes.Length} {index} {count}", e);
+                throw new Exception($"from bson error: {type.Name}", e);
             }
         }
 
@@ -218,7 +198,7 @@ namespace ET
             }
             catch (Exception e)
             {
-                throw new Exception($"from bson error: {type.FullName} {stream.Position} {stream.Length}", e);
+                throw new Exception($"from bson error: {type.Name}", e);
             }
         }
 
@@ -233,7 +213,7 @@ namespace ET
             }
             catch (Exception e)
             {
-                throw new Exception($"from bson error: {typeof (T).FullName} {bytes.Length}", e);
+                throw new Exception($"from bson error: {typeof (T).Name}", e);
             }
         }
 

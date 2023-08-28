@@ -1,8 +1,5 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace ET.Analyzer
@@ -33,42 +30,21 @@ namespace ET.Analyzer
 
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction((analysisContext =>
-            {
-                if (analysisContext.Compilation.AssemblyName==AnalyzeAssembly.UnityCodes)
-                {
-                    analysisContext.RegisterSemanticModelAction((modelAnalysisContext =>
-                    {
-                        if (AnalyzerHelper.IsSemanticModelNeedAnalyze(modelAnalysisContext.SemanticModel,UnityCodesPath.AllHotfix))
-                        {
-                            AnalyzeSemanticModel(modelAnalysisContext);
-                        }
-                        
-                    } ));
-                    return;
-                }
-                
-                if (AnalyzerHelper.IsAssemblyNeedAnalyze(analysisContext.Compilation.AssemblyName,AnalyzeAssembly.AllHotfix))
-                {
-                    analysisContext.RegisterSemanticModelAction((this.AnalyzeSemanticModel));
-                }
-            } ));
+            context.RegisterSymbolAction(this.Analyzer, SymbolKind.NamedType);
         }
 
-        private void AnalyzeSemanticModel(SemanticModelAnalysisContext analysisContext)
+        private void Analyzer(SymbolAnalysisContext context)
         {
-            foreach (var classDeclarationSyntax in analysisContext.SemanticModel.SyntaxTree.GetRoot().DescendantNodes<ClassDeclarationSyntax>())
+            if (!AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllHotfix))
             {
-                var classTypeSymbol = analysisContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-                if (classTypeSymbol!=null)
-                {
-                    Analyzer(analysisContext, classTypeSymbol);
-                }
+                return;
             }
-        }
-        
-        private void Analyzer(SemanticModelAnalysisContext context, INamedTypeSymbol namedTypeSymbol)
-        {
+
+            if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
+            {
+                return;
+            }
+
             if (namedTypeSymbol.IsStatic)
             {
                 return;
@@ -79,7 +55,6 @@ namespace ET.Analyzer
                 foreach (SyntaxReference? declaringSyntaxReference in namedTypeSymbol.DeclaringSyntaxReferences)
                 {
                     Diagnostic diagnostic = Diagnostic.Create(Rule, declaringSyntaxReference.GetSyntax()?.GetLocation(), namedTypeSymbol.Name);
-                    //Diagnostic diagnostic = Diagnostic.Create(Rule, declaringSyntaxReference.GetSyntax()?.GetLocation(), context.SemanticModel.SyntaxTree.FilePath);
                     context.ReportDiagnostic(diagnostic);
                 }
             }

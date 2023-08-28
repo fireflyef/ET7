@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace ET.Analyzer
+﻿namespace ET.Analyzer
 {
     public static class AnalyzeAssembly
     {
@@ -14,62 +12,37 @@ namespace ET.Analyzer
         private const string UnityModelView = "Unity.ModelView";
         private const string UnityHotfixView = "Unity.HotfixView";
 
-        public const string UnityCodes = "Unity.Codes";
-        public const string UnityAllModel = "Unity.AllModel";
-        public const string UnityAllHotfix = "Unity.AllHotfix";
+        private const string UnityModelCodes = "Unity.Model.Codes";
+        private const string UnityHotfixCodes = "Unity.Hotfix.Codes";
+        private const string UnityModelViewCodes = "Unity.ModelView.Codes";
+        private const string UnityHotfixViewCodes = "Unity.HotfixView.Codes";
 
         public static readonly string[] AllHotfix =
         {
-            DotNetHotfix, UnityHotfix, UnityHotfixView,
-            UnityAllHotfix,
+            DotNetHotfix, UnityHotfix, UnityHotfixView, 
+            UnityHotfixCodes, UnityHotfixViewCodes
         };
 
         public static readonly string[] AllModel =
         {
             DotNetModel, UnityModel, 
-            UnityModelView,UnityAllModel
+            UnityModelView, UnityModel, UnityModelCodes
         };
 
         public static readonly string[] AllModelHotfix =
         {
             DotNetModel, DotNetHotfix, 
             UnityModel, UnityHotfix, UnityModelView, UnityHotfixView, 
-            UnityAllModel, UnityAllHotfix,
+            UnityModelCodes, UnityModelViewCodes, UnityHotfixCodes, UnityHotfixViewCodes
         };
         
         public static readonly string[] All =
         {
             DotNetCore, DotNetModel, DotNetHotfix, 
             UnityCore, UnityModel, UnityHotfix, UnityModelView, UnityHotfixView, 
-            UnityCodes,UnityAllModel, UnityAllHotfix,
-        };
-
-        public static readonly string[] ServerModelHotfix =
-        {
-            DotNetModel,DotNetHotfix,
-        };
-    }
-
-    public static class UnityCodesPath
-    {
-        private static readonly string UnityModel = @"Unity\Assets\Scripts\Model\".Replace('\\',Path.DirectorySeparatorChar);
-        private static readonly string UnityModelView = @"Unity\Assets\Scripts\ModelView\".Replace('\\',Path.DirectorySeparatorChar);
-        private static readonly string UnityHotfix = @"Unity\Assets\Scripts\Hotfix\".Replace('\\',Path.DirectorySeparatorChar);
-        private static readonly string UnityHotfixView = @"Unity\Assets\Scripts\HotfixView\".Replace('\\',Path.DirectorySeparatorChar);
-
-        public static readonly string[] AllModelHotfix =
-        {
-            UnityModel, UnityHotfix, UnityModelView, UnityHotfixView, 
+            UnityModelCodes, UnityModelViewCodes, UnityHotfixCodes, UnityHotfixViewCodes
         };
         
-        public static readonly string[] AllHotfix =
-        {
-            UnityHotfix, UnityHotfixView, 
-        };
-
-        public static readonly string[] AllModel =
-        {
-            UnityModel, UnityModelView
-        };
+        
     }
 }

@@ -37,14 +37,15 @@ namespace ET.Analyzer
 
             foreach (ISymbol? memberSymbol in namedTypeSymbol.GetMembers())
             {
-                if (memberSymbol is IFieldSymbol { IsConst: false,IsStatic:true } or IPropertySymbol { IsStatic: true })
+                // 筛选出非Const字段成员
+                if (memberSymbol is IFieldSymbol fieldSymbol && fieldSymbol.IsStatic&& !fieldSymbol.IsConst)
                 {
-                    bool hasAttr = memberSymbol.GetAttributes().Any(x => x.AttributeClass?.ToString() == Definition.StaticFieldAttribute);
+                    bool hasAttr = fieldSymbol.GetAttributes().Any(x => x.AttributeClass?.ToString() == Definition.StaticFieldAttribute);
                     if (!hasAttr)
                     {
-                        ReportDiagnostic(memberSymbol);
+                        ReportDiagnostic(fieldSymbol);
                     }
-                }
+                } 
             }
 
             void ReportDiagnostic(ISymbol symbol)

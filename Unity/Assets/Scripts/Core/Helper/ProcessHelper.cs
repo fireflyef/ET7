@@ -8,7 +8,7 @@ namespace ET
 {
     public static class ProcessHelper
     {
-        public static System.Diagnostics.Process Run(string exe, string arguments, string workingDirectory = ".", bool waitExit = false)
+        public static Process Run(string exe, string arguments, string workingDirectory = ".", bool waitExit = false)
         {
             //Log.Debug($"Process Run exe:{exe} ,arguments:{arguments} ,workingDirectory:{workingDirectory}");
             try
@@ -41,7 +41,7 @@ namespace ET
                     RedirectStandardError = redirectStandardError,
                 };
 
-                System.Diagnostics.Process process = System.Diagnostics.Process.Start(info);
+                Process process = Process.Start(info);
 
                 if (waitExit)
                 {
@@ -56,7 +56,7 @@ namespace ET
             }
         }
         
-        private static async ETTask WaitExitAsync(System.Diagnostics.Process process)
+        private static async ETTask WaitExitAsync(Process process)
         {
             await process.WaitForExitAsync();
 #if UNITY
@@ -65,7 +65,7 @@ namespace ET
         }
         
 #if UNITY
-        private static async Task WaitForExitAsync(this System.Diagnostics.Process self)
+        private static async Task WaitForExitAsync(this Process self)
         {
             if (!self.HasExited)
             {

@@ -6,9 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
-using YooAsset;
 using Debug = UnityEngine.Debug;
-#pragma warning disable CS0162
 
 namespace ET
 {
@@ -21,12 +19,21 @@ namespace ET
 		MacOS,
 		Linux
 	}
+	
+	public enum BuildType
+	{
+		Development,
+		Release,
+	}
 
 	public class BuildEditor : EditorWindow
 	{
 		private PlatformType activePlatform;
 		private PlatformType platformType;
 		private bool clearFolder;
+		private bool isBuildExe;
+		private bool isContainAB;
+		private CodeOptimization codeOptimization = CodeOptimization.Debug;
 		private BuildOptions buildOptions;
 		private BuildAssetBundleOptions buildAssetBundleOptions = BuildAssetBundleOptions.None;
 
@@ -62,26 +69,20 @@ namespace ET
 		{
 			this.platformType = (PlatformType)EditorGUILayout.EnumPopup(platformType);
 			this.clearFolder = EditorGUILayout.Toggle("clean folder? ", clearFolder);
-			BuildType codeOptimization = (BuildType)EditorGUILayout.EnumPopup("BuildType ", this.globalConfig.BuildType);
-			
-			if (codeOptimization != this.globalConfig.BuildType)
-			{
-				this.globalConfig.BuildType = codeOptimization;
-				EditorUtility.SetDirty(this.globalConfig);
-				AssetDatabase.SaveAssets();
-			}
-			
+			this.isBuildExe = EditorGUILayout.Toggle("build exe?", this.isBuildExe);
+			this.isContainAB = EditorGUILayout.Toggle("contain assetsbundle?", this.isContainAB);
+			this.codeOptimization = (CodeOptimization)EditorGUILayout.EnumPopup("CodeOptimization ", this.codeOptimization);
 			EditorGUILayout.LabelField("BuildAssetBundleOptions ");
 			this.buildAssetBundleOptions = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField(this.buildAssetBundleOptions);
 			
-			switch (this.globalConfig.BuildType)
+			switch (this.codeOptimization)
 			{
-				case BuildType.None:
-				case BuildType.Debug:
-					this.buildOptions = BuildOptions.BuildScriptsOnly;
+				case CodeOptimization.None:
+				case CodeOptimization.Debug:
+					this.buildOptions = BuildOptions.Development | BuildOptions.ConnectWithProfiler;
 					break;
-				case BuildType.Release:
-					this.buildOptions = BuildOptions.BuildScriptsOnly;
+				case CodeOptimization.Release:
+					this.buildOptions = BuildOptions.None;
 					break;
 			}
 
@@ -108,36 +109,64 @@ namespace ET
 							break;
 					}
 				}
-				BuildHelper.Build(this.platformType, this.buildAssetBundleOptions, this.buildOptions, this.clearFolder);
+				BuildHelper.Build(this.platformType, this.buildAssetBundleOptions, this.buildOptions, this.isBuildExe, this.isContainAB, this.clearFolder);
 			}
 			
 			GUILayout.Label("");
 			GUILayout.Label("Code Compile：");
 			
-			CodeMode codeMode = (CodeMode)EditorGUILayout.EnumPopup("CodeMode: ", this.globalConfig.CodeMode);
-			if (codeMode != this.globalConfig.CodeMode)
+			this.globalConfig.CodeMode = (CodeMode)EditorGUILayout.EnumPopup("CodeMode: ", this.globalConfig.CodeMode);
+			
+			if (GUILayout.Button("BuildModelAndHotfix"))
 			{
-				this.globalConfig.CodeMode = codeMode;
-				EditorUtility.SetDirty(this.globalConfig);
-				AssetDatabase.SaveAssets();
+				if (Define.EnableCodes)
+				{
+					throw new Exception("now in ENABLE_CODES mode, do not need Build!");
+				}
+				BuildAssembliesHelper.BuildModel(this.codeOptimization, globalConfig);
+				BuildAssembliesHelper.BuildHotfix(this.codeOptimization, globalConfig);
+
+				AfterCompiling();
+				
+				ShowNotification("Build Model And Hotfix Success!");
 			}
 			
-			EPlayMode ePlayMode = (EPlayMode)EditorGUILayout.EnumPopup("EPlayMode: ", this.globalConfig.EPlayMode);
-			if (ePlayMode != this.globalConfig.EPlayMode)
+			if (GUILayout.Button("BuildModel"))
 			{
-				this.globalConfig.EPlayMode = ePlayMode;
-				EditorUtility.SetDirty(this.globalConfig);
-				AssetDatabase.SaveAssets();
-			}
+				if (Define.EnableCodes)
+				{
+					throw new Exception("now in ENABLE_CODES mode, do not need Build!");
+				}
+				BuildAssembliesHelper.BuildModel(this.codeOptimization, globalConfig);
 
-			if (GUILayout.Button("ReGenerateProjectFiles"))
+				AfterCompiling();
+				
+				ShowNotification("Build Model Success!");
+			}
+			
+			if (GUILayout.Button("BuildHotfix"))
 			{
-				BuildHelper.ReGenerateProjectFiles();
+				if (Define.EnableCodes)
+				{
+					throw new Exception("now in ENABLE_CODES mode, do not need Build!");
+				}
+				BuildAssembliesHelper.BuildHotfix(this.codeOptimization, globalConfig);
+
+				AfterCompiling();
+				
+				ShowNotification("Build Hotfix Success!");
 			}
 			
 			if (GUILayout.Button("ExcelExporter"))
 			{
+				//Directory.Delete("Assets/Bundles/Config", true);
 				ToolsEditor.ExcelExporter();
+				
+				// 设置ab包
+				AssetImporter assetImporter = AssetImporter.GetAtPath($"Assets/Bundles/Config");
+				assetImporter.assetBundleName = "Config.unity3d";
+				AssetDatabase.SaveAssets();
+				AssetDatabase.Refresh();
 			}
 			
 			if (GUILayout.Button("Proto2CS"))
@@ -146,6 +175,25 @@ namespace ET
 			}
 
 			GUILayout.Space(5);
+		}
+		
+		private static void AfterCompiling()
+		{
+			Directory.CreateDirectory(BuildAssembliesHelper.CodeDir);
+
+			// 设置ab包
+			AssetImporter assetImporter = AssetImporter.GetAtPath("Assets/Bundles/Code");
+			assetImporter.assetBundleName = "Code.unity3d";
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+            
+			Debug.Log("build success!");
+		}
+		
+		public static void ShowNotification(string tips)
+		{
+			EditorWindow game = EditorWindow.GetWindow(typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView"));
+			game?.ShowNotification(new GUIContent($"{tips}"));
 		}
 	}
 }

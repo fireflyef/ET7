@@ -38,45 +38,23 @@ namespace ET.Analyzer
 
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            
-            context.RegisterCompilationStartAction((analysisContext =>
-            {
-                if (analysisContext.Compilation.AssemblyName==AnalyzeAssembly.UnityCodes)
-                {
-                    analysisContext.RegisterSemanticModelAction((modelAnalysisContext =>
-                    {
-                        if (AnalyzerHelper.IsSemanticModelNeedAnalyze(modelAnalysisContext.SemanticModel,UnityCodesPath.AllModel))
-                        {
-                            AnalyzeSemanticModel(modelAnalysisContext);
-                        }
-                        
-                    } ));
-                    return;
-                }
-                
-                if (AnalyzerHelper.IsAssemblyNeedAnalyze(analysisContext.Compilation.AssemblyName,AnalyzeAssembly.AllModel))
-                {
-                    analysisContext.RegisterSemanticModelAction((this.AnalyzeSemanticModel));
-                }
-            } ));
-        }
-        
-        private void AnalyzeSemanticModel(SemanticModelAnalysisContext analysisContext)
-        {
-            foreach (var classDeclarationSyntax in analysisContext.SemanticModel.SyntaxTree.GetRoot().DescendantNodes<ClassDeclarationSyntax>())
-            {
-                var classTypeSymbol = analysisContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-                if (classTypeSymbol!=null)
-                {
-                    Analyzer(analysisContext, classTypeSymbol);
-                }
-            }
+            context.RegisterSymbolAction(this.Analyzer, SymbolKind.NamedType);
         }
 
-        private void Analyzer(SemanticModelAnalysisContext context, INamedTypeSymbol namedTypeSymbol)
+        private void Analyzer(SymbolAnalysisContext context)
         {
+            if (!AnalyzerHelper.IsAssemblyNeedAnalyze(context.Compilation.AssemblyName, AnalyzeAssembly.AllModel))
+            {
+                return;
+            }
+            
+            if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
+            {
+                return;
+            }
+
             // 筛选出实体类
-            if (namedTypeSymbol.BaseType?.ToString() != Definition.EntityType && namedTypeSymbol.BaseType?.ToString() != Definition.LSEntityType)
+            if (namedTypeSymbol.BaseType?.ToString() != Definition.EntityType)
             {
                 return;
             }

@@ -2,14 +2,8 @@
 {
 	public static class Define
 	{
-		public const string CodeDir = "Assets/Bundles/Code/";
-		public const string BuildOutputDir = "Temp/Bin/Debug";
-#if DEBUG
-		public static bool IsDebug = true;
-#else
-		public static bool IsDebug = false;
-#endif
-		
+		public const string BuildOutputDir = "./Temp/Bin/Debug";
+
 #if UNITY_EDITOR && !ASYNC
 		public static bool IsAsync = false;
 #else
@@ -22,10 +16,10 @@
         public static bool IsEditor = false;
 #endif
 		
-#if ENABLE_DLL
-		public static bool EnableDll = true;
+#if ENABLE_CODES
+		public static bool EnableCodes = true;
 #else
-        public static bool EnableDll = false;
+        public static bool EnableCodes = false;
 #endif
 		
 #if ENABLE_VIEW

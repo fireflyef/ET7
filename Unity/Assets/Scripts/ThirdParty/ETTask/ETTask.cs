@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -20,7 +19,7 @@ namespace ET
             }
         }
 
-        private static readonly ConcurrentQueue<ETTask> queue = new();
+        private static readonly Queue<ETTask> queue = new Queue<ETTask>();
 
         /// <summary>
         /// 请不要随便使用ETTask的对象池，除非你完全搞懂了ETTask!!!
@@ -33,11 +32,12 @@ namespace ET
             {
                 return new ETTask();
             }
-            if (!queue.TryDequeue(out ETTask task))
+            
+            if (queue.Count == 0)
             {
-                return new ETTask() {fromPool = true}; 
+                return new ETTask() {fromPool = true};    
             }
-            return task;
+            return queue.Dequeue();
         }
 
         private void Recycle()
@@ -165,7 +165,7 @@ namespace ET
     [AsyncMethodBuilder(typeof (ETAsyncTaskMethodBuilder<>))]
     public class ETTask<T>: ICriticalNotifyCompletion
     {
-        private static readonly ConcurrentQueue<ETTask<T>> queue = new();
+        private static readonly Queue<ETTask<T>> queue = new Queue<ETTask<T>>();
         
         /// <summary>
         /// 请不要随便使用ETTask的对象池，除非你完全搞懂了ETTask!!!
@@ -179,11 +179,11 @@ namespace ET
                 return new ETTask<T>();
             }
             
-            if (!queue.TryDequeue(out ETTask<T> task))
+            if (queue.Count == 0)
             {
-                return new ETTask<T>() {fromPool = true}; 
+                return new ETTask<T>() { fromPool = true };    
             }
-            return task;
+            return queue.Dequeue();
         }
         
         private void Recycle()

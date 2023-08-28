@@ -7,13 +7,11 @@ namespace ET
 {
     internal struct AsyncETVoidMethodBuilder
     {
-        private IStateMachineWrap iStateMachineWrap;
-        
         // 1. Static Create method.
         [DebuggerHidden]
         public static AsyncETVoidMethodBuilder Create()
         {
-            AsyncETVoidMethodBuilder builder = new();
+            AsyncETVoidMethodBuilder builder = new AsyncETVoidMethodBuilder();
             return builder;
         }
 
@@ -25,11 +23,6 @@ namespace ET
         [DebuggerHidden]
         public void SetException(Exception e)
         {
-            if (this.iStateMachineWrap != null)
-            {
-                this.iStateMachineWrap.Recycle();
-                this.iStateMachineWrap = null;
-            }
             ETTask.ExceptionHandler.Invoke(e);
         }
 
@@ -37,19 +30,14 @@ namespace ET
         [DebuggerHidden]
         public void SetResult()
         {
-            if (this.iStateMachineWrap != null)
-            {
-                this.iStateMachineWrap.Recycle();
-                this.iStateMachineWrap = null;
-            }
+            // do nothing
         }
 
         // 5. AwaitOnCompleted
         [DebuggerHidden]
         public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : INotifyCompletion where TStateMachine : IAsyncStateMachine
         {
-            this.iStateMachineWrap ??= StateMachineWrap<TStateMachine>.Fetch(ref stateMachine);
-            awaiter.OnCompleted(this.iStateMachineWrap.MoveNext);
+            awaiter.OnCompleted(stateMachine.MoveNext);
         }
 
         // 6. AwaitUnsafeOnCompleted
@@ -57,8 +45,7 @@ namespace ET
         [SecuritySafeCritical]
         public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine) where TAwaiter : ICriticalNotifyCompletion where TStateMachine : IAsyncStateMachine
         {
-            this.iStateMachineWrap ??= StateMachineWrap<TStateMachine>.Fetch(ref stateMachine);
-            awaiter.UnsafeOnCompleted(this.iStateMachineWrap.MoveNext);
+            awaiter.UnsafeOnCompleted(stateMachine.MoveNext);
         }
 
         // 7. Start
