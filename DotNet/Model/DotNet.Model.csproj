@@ -29,9 +29,9 @@
             <Link>Server\%(RecursiveDir)%(FileName)%(Extension)</Link>
         </Compile>
 
-        <Compile Include="..\..\Unity\Assets\Scripts\Codes\Model\Client\**\*.cs"> 
+        <!-- <Compile Include="..\..\Unity\Assets\Scripts\Codes\Model\Client\**\*.cs"> 
             <Link>Client\%(RecursiveDir)%(FileName)%(Extension)</Link>
-        </Compile>
+        </Compile> -->
         
         <Compile Include="..\..\Unity\Assets\Scripts\Codes\Model\Share\**\*.cs">
             <Link>Share\%(RecursiveDir)%(FileName)%(Extension)</Link>
