@@ -36,7 +36,7 @@
     
     <ItemGroup>
       <ProjectReference Include="..\..\Share\Analyzer\Share.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-      <ProjectReference Include="..\ThirdParty\DotNet.ThirdParty.csproj" />
+      <ProjectReference Include="..\ThirdParty\Server.ThirdParty.csproj" />
     </ItemGroup>
 
 </Project>
