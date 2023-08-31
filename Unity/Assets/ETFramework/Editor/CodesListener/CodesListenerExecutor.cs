@@ -37,13 +37,13 @@ public class CodesListenerExecutor
                 { "HotfixView", new List<string>() { "Client" } } });
         //服务端Model
         RegisterCodeFolder(CodeClass.Server, 
-            "../DotNet/Model/Server.Model.csproj", "../Codes", 
+            "../DotNet/Model/DotNet.Model.csproj", "../Codes", 
             new Dictionary<string, List<string>>() { 
                 { "Model", new List<string>() { "Server", "Share" ,"Client"} }, 
                 { "Generate", new List<string> { "Server", "Share" } } });
         //服务端Hotfix
         RegisterCodeFolder(CodeClass.Server, 
-            "../DotNet/Hotfix/Server.Hotfix.csproj", "../Codes", 
+            "../DotNet/Hotfix/DotNet.Hotfix.csproj", "../Codes", 
             new Dictionary<string, List<string>>() { 
                 { "Hotfix", new List<string>() { "Server", "Share","Client" } } });
     }

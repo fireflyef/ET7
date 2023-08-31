@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unity", "Unity", "{914C77C9-212A-4DD0-8D9A-074620E77FAA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{46008B91-6EC0-448B-8D1A-D8C6D2EEBEF4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DotNet", "DotNet", "{46008B91-6EC0-448B-8D1A-D8C6D2EEBEF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Model", "Unity\Unity.Model.csproj", "{9498BFB4-D9F5-C441-13E3-3F26F7700E29}"
 EndProject
@@ -21,15 +21,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.ThirdParty", "Unity\U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Core", "Unity\Unity.Core.csproj", "{770E9BEB-B313-3761-FAA2-76DAF4B34ADA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.App", "DotNet\App\Server.App.csproj", "{CCF5D7E3-D5C6-4DE6-BB2D-1A931602F1AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.App", "DotNet\App\DotNet.App.csproj", "{CCF5D7E3-D5C6-4DE6-BB2D-1A931602F1AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Core", "DotNet\Core\Server.Core.csproj", "{20CA1FD3-A23B-4F12-ADA5-C3B759814F9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Core", "DotNet\Core\DotNet.Core.csproj", "{20CA1FD3-A23B-4F12-ADA5-C3B759814F9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Hotfix", "DotNet\Hotfix\Server.Hotfix.csproj", "{1059524B-9F01-4C3E-8A7C-6BBDD1D174C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Hotfix", "DotNet\Hotfix\DotNet.Hotfix.csproj", "{1059524B-9F01-4C3E-8A7C-6BBDD1D174C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Model", "DotNet\Model\Server.Model.csproj", "{6AFC109E-85DE-4A14-9C81-95D93C3F90AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Model", "DotNet\Model\DotNet.Model.csproj", "{6AFC109E-85DE-4A14-9C81-95D93C3F90AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.ThirdParty", "DotNet\ThirdParty\Server.ThirdParty.csproj", "{4B15C845-B5BD-4105-AE91-9B057F8AC134}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.ThirdParty", "DotNet\ThirdParty\DotNet.ThirdParty.csproj", "{4B15C845-B5BD-4105-AE91-9B057F8AC134}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Share", "Share", "{1272AF7B-A962-4BA4-8A9C-FFA7E131A0AC}"
 EndProject
@@ -39,7 +39,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Share.Tool", "Share\Tool\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Loader", "Unity\Unity.Loader.csproj", "{32B76B98-B8F4-F864-D1F9-50CF255042D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Loader", "DotNet\Loader\Server.Loader.csproj", "{1D5E890A-C9D5-45DF-B098-73DBE39EB311}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Loader", "DotNet\Loader\DotNet.Loader.csproj", "{1D5E890A-C9D5-45DF-B098-73DBE39EB311}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
