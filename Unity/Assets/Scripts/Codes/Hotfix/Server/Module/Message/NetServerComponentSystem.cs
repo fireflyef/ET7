@@ -46,10 +46,11 @@ namespace ET.Server
 
             if (self.DomainScene().SceneType != SceneType.BenchmarkServer)
             {
+                // @TODO delete 为了开发方便，先不加验证
                 // 挂上这个组件，5秒就会删除session，所以客户端验证完成要删除这个组件。该组件的作用就是防止外挂一直连接不发消息也不进行权限验证
-                session.AddComponent<SessionAcceptTimeoutComponent>();
+                //session.AddComponent<SessionAcceptTimeoutComponent>();
                 // 客户端连接，2秒检查一次recv消息，10秒没有消息则断开
-                session.AddComponent<SessionIdleCheckerComponent>();
+                //session.AddComponent<SessionIdleCheckerComponent>();
             }
         }
         

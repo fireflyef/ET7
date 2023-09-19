@@ -23,10 +23,10 @@ namespace ET
 
     public static class InnerProto2CS
     {
-        private const string protoDir = "../Unity/Assets/Config/Proto";
-        private const string clientMessagePath = "../Unity/Assets/Scripts/Codes/Model/Generate/Client/Message/";
-        private const string serverMessagePath = "../Unity/Assets/Scripts/Codes/Model/Generate/Server/Message/";
-        private const string clientServerMessagePath = "../Unity/Assets/Scripts/Codes/Model/Generate/ClientServer/Message/";
+        private const string protoDir = "../../Assets/Config/Proto";
+        private const string clientMessagePath = "../../Assets/_AiPP/Scripts/AutoGen/Message/Client/";
+        private const string serverMessagePath = "../../Assets/_AiPP/Scripts/AutoGen/Message/Server/";
+        private const string clientServerMessagePath = "../../Assets/_AiPP/Scripts/AutoGen/Message/ClientServer/";
         private static readonly char[] splitChars = { ' ', '\t' };
         private static readonly List<OpcodeInfo> msgOpcode = new List<OpcodeInfo>();
 
@@ -74,6 +74,12 @@ namespace ET
             string s = File.ReadAllText(proto);
 
             StringBuilder sb = new StringBuilder();
+            
+            sb.Append("//------------------------------------------------------------;\n");
+            sb.Append("// 此文件由工具自动生成，请勿直接修改。\n");
+            sb.Append($"// 生成时间：{DateTime.UtcNow.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff")}\n");
+            sb.Append("//------------------------------------------------------------;\n\n");
+            
             sb.Append("using ET;\n");
             sb.Append("using ProtoBuf;\n");
             sb.Append("using System.Collections.Generic;\n");
@@ -117,7 +123,7 @@ namespace ET
 
                     msgOpcode.Add(new OpcodeInfo() { Name = msgName, Opcode = ++startOpcode });
 
-                    sb.Append($"\t[Message({protoName}.{msgName})]\n");
+                    sb.Append($"\t[Message({protoName}.{msgName})]\n"); 
                     sb.Append($"\t[ProtoContract]\n");
                     sb.Append($"\tpublic partial class {msgName}: ProtoObject");
                     if (parentClass == "IActorMessage" || parentClass == "IActorRequest" || parentClass == "IActorResponse")

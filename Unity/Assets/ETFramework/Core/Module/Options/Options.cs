@@ -29,7 +29,7 @@ namespace ET
         [Option("Develop", Required = false, Default = 0, HelpText = "develop mode, 0正式 1开发 2压测")]
         public int Develop { get; set; }
 
-        [Option("LogLevel", Required = false, Default = 2)]
+        [Option("LogLevel", Required = false, Default = 1)]
         public int LogLevel { get; set; }
         
         [Option("Console", Required = false, Default = 0)]
